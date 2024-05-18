@@ -1,0 +1,17 @@
+# Ignore encoding~ directories
+encoding_contriever-msmarco/
+encoding_dpr_bs16_ep3_hn16_accumu4/
+encoding_dpr_bs16_ep3_hn16_accumu4_bert/
+encoding_dpr_bs16_ep3_hn16_bert_norm/
+encoding_dpr_bs16_ep3_hn16_bert_norm_all_title_accum/
+encoding_dpr_bs16_ep3_hn16_bert_norm_title/
+encoding_dpr_bs16_ep3_hn16_bert_norm_title_accum/
+encoding_dpr_bs16_ep3_hn16_q2d_bert_norm_title/
+encoding_e5-base/
+encoding_e5-base-v2/
+encoding_e5-large-v2/
+monoT5_ja_1e_3/
+results/*
+sh_dir/
+wandb/
+__pycache__
