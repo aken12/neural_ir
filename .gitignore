@@ -23,4 +23,3 @@ train.sh*
 bm25_searcher/beir_index/*
 bm25_searcher/collections/*
 bm25_searcher/results/*
-
