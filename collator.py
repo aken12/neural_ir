@@ -3,6 +3,8 @@ from dataclasses import dataclass
 from transformers import PreTrainedTokenizer
 import argparse
 
+from neural_ir.normalize_text import normalize
+
 logger = logging.getLogger(__name__)
 
 @dataclass
@@ -12,9 +14,14 @@ class EncodeCollator:
 
     def __call__(self, features):
         text_ids = [x[0] for x in features]
-        texts = [x[1] for x in features]
+
+        # if self.data_args.lower_text:
+        texts = [normalize(x[1].lower()) for x in features]
+        # else:
+        #     texts = [x[1] for x in features]
 
         max_length = self.data_args.query_max_len if self.data_args.encode_is_query else self.data_args.passage_max_len
+        
         collated_texts = self.tokenizer(
             texts,
             padding=False, 

@@ -1,0 +1,14 @@
+BeIR/scidocs
+BeIR/climate-fever
+BeIR/fever
+BeIR/dbpedia-entity
+BeIR/quora
+BeIR/webis-touche2020
+BeIR/arguana
+BeIR/hotpotqa
+BeIR/nq
+BeIR/msmarco
+BeIR/nfcorpus
+BeIR/scifact
+BeIR/trec-covid
+BeIR/fiqa

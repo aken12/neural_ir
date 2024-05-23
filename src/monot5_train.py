@@ -63,19 +63,20 @@ def main():
     tokenizer = T5Tokenizer.from_pretrained(args.base_model)
 
     model = T5ForConditionalGeneration.from_pretrained(args.base_model)
-    model.enable_input_require_grads()
-    model.gradient_checkpointing_enable()
+    
+    # model.enable_input_require_grads()
+    # model.gradient_checkpointing_enable()
 
-    peft_config = peft.LoraConfig(
-        task_type=peft.TaskType.SEQ_2_SEQ_LM,
-        r=8,
-        lora_alpha=32,
-        lora_dropout=0.1,
-        inference_mode=False,
-    )
+    # peft_config = peft.LoraConfig(
+    #     task_type=peft.TaskType.SEQ_2_SEQ_LM,
+    #     r=8,
+    #     lora_alpha=32,
+    #     lora_dropout=0.1,
+    #     inference_mode=False,
+    # )
 
-    model = peft.get_peft_model(model, peft_config)
-    model.print_trainable_parameters()
+    # model = peft.get_peft_model(model, peft_config)
+    # model.print_trainable_parameters()
 
     dataset_train = RerankerDataset(args)
 
@@ -93,7 +94,7 @@ def main():
         save_steps=steps, 
         logging_steps=args.logging_steps,
         per_device_train_batch_size=args.per_device_train_batch_size,
-        gradient_accumulation_steps=args.gradient_accumulation_steps,
+        # gradient_accumulation_steps=args.gradient_accumulation_steps,
         learning_rate=args.learning_rate,
         weight_decay=5e-5,
         num_train_epochs=1,

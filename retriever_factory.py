@@ -6,6 +6,7 @@ from models.dense import DenseModel
 
 def retreiver_factory(model_name,normalize=False):
     if model_name == "facebook/contriever-msmarco":
+        print("use facebook/contriever-msmarco")
         model,tokenizer = ContrieverEncoder.load(model_name)
     
     elif model_name == "intfloat/e5-base-v2":
