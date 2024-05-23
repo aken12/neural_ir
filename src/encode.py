@@ -40,6 +40,8 @@ def main():
     parser.add_argument('--normalize', dest='normalize',action='store_true')
     parser.add_argument('--dataset_split', dest='dataset_split',default=None,type=str)
     parser.add_argument('--dataset_config', dest='dataset_config',default=None,type=str)
+    parser.add_argument('--lower_text', dest='lower',action='store_true')
+    # parser.add_argument('--text_normalize', dest='text_normalize',action='store_true')
     
     args = parser.parse_args()
 

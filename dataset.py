@@ -22,21 +22,35 @@ class EncodeDataset(Dataset):
         if self.data_args.local_data:
             self.encode_data = {"query_id": [],"query": []} if self.data_args.encode_is_query \
                                else {"docid": [],"text": []} 
+            
             if self.data_args.title:
                 self.encode_data["title"] = []
             
-            with open(self.data_args.dataset_name)as fr:
-                for line in fr:
-                    line = line.strip().split('\t')
+            with open(self.data_args.dataset_name) as fr:
+                if self.data_args.dataset_name.split('.')[-1] == "tsv":
+                    for line in fr:
+                        line = line.strip().split('\t')
 
-                    if self.data_args.encode_is_query:
-                        self.encode_data["query_id"].append(line[0])
-                        self.encode_data["query"].append(line[1])
-                    else:
-                        self.encode_data["docid"].append(line[0])
-                        self.encode_data["text"].append(line[1])
-                        if self.data_args.title:
-                            self.encode_data['title'].append(line[2])
+                        if self.data_args.encode_is_query:
+                            self.encode_data["query_id"].append(line[0])
+                            self.encode_data["query"].append(line[1])
+                        else:
+                            self.encode_data["docid"].append(line[0])
+                            self.encode_data["text"].append(line[1])
+                            if self.data_args.title:
+                                self.encode_data['title'].append(line[2])
+                                
+                else:
+                    for line in fr:
+                        line = json.loads(line)
+                        if self.data_args.encode_is_query:
+                            self.encode_data["query_id"].append(line[0])
+                            self.encode_data["query"].append(line[1])
+                        else:
+                            self.encode_data["docid"].append(line["id"])
+                            self.encode_data["text"].append(line["contents"])
+                            if self.data_args.title:
+                                self.encode_data['title'].append(line["title"])
 
             self.encode_data = HFDataset.from_dict(self.encode_data)
 
@@ -74,8 +88,10 @@ class EncodeDataset(Dataset):
         else:
             text_id = text['docid']
             if self.data_args.title:
-                formated_text = text['title'] + '[SEP]' + text['text']
+                # formated_text = text['title'] + '[SEP]' + text['text']
                 # formated_text = "passage: " + text['title'] + ' ' + text['text']
+                formated_text = text['title'] + ' ' + text['text']
+
             else:
                 formated_text = text['text']
         return text_id, formated_text

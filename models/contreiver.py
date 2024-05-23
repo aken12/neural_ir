@@ -1,13 +1,19 @@
 import torch
 from torch import nn, Tensor
 from transformers import AutoTokenizer, AutoModel, AutoConfig, PreTrainedModel
+import torch.nn.functional as F
 
 from neural_ir.utils import EncoderOutput
 
-class ContrieverEncoder(PreTrainedModel):
+# class ContrieverEncoder(PreTrainedModel):
+#     def __init__(self, model_name='facebook/contriever-msmarco'):
+#         config = AutoConfig.from_pretrained(model_name)
+#         super().__init__(config)
+#         self.contriever = AutoModel.from_pretrained(model_name)
+
+class ContrieverEncoder(nn.Module):
     def __init__(self, model_name='facebook/contriever-msmarco'):
-        config = AutoConfig.from_pretrained(model_name)
-        super().__init__(config)
+        super(ContrieverEncoder, self).__init__()
         self.contriever = AutoModel.from_pretrained(model_name)
 
     def average_pool(self,last_hidden_states: Tensor,attention_mask: Tensor):
@@ -17,11 +23,13 @@ class ContrieverEncoder(PreTrainedModel):
     def encode_query(self,queries):
         q_embs = self.contriever(**queries).last_hidden_state
         q_embs= self.average_pool(q_embs,queries['attention_mask'])
+        # q_embs = F.normalize(q_embs, p=2, dim=1)
         return q_embs
 
     def encode_passage(self,passages):
         p_embs = self.contriever(**passages).last_hidden_state
         p_embs= self.average_pool(p_embs,passages['attention_mask'])
+        # p_embs = F.normalize(p_embs, p=2, dim=1)
         return p_embs
     
     def forward(self,queries=None,passages=None):
@@ -57,6 +65,7 @@ def main():
         score01 = embeddings[0] @ embeddings[1] #1.0473
         score02 = embeddings[0] @ embeddings[2] #1.0095
 
-        print(score01,score02)
+        print(score01,score02) #tensor(1.0473) tensor(1.0095) # tensor(1.7735) tensor(1.5486)
+
 if __name__=="__main__":
     main()

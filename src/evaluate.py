@@ -4,7 +4,6 @@ import json
 import argparse
 import os 
 
-from pyserini.search.lucene import LuceneSearcher
 import pytrec_eval
 
 import logging
@@ -90,25 +89,33 @@ def main():
     parser.add_argument('--exp',help='',required=True)
     parser.add_argument('--run_dir',help='',default=None)
     parser.add_argument('--run',help='',default=None)
+    parser.add_argument('--msmarco',help='',action='store_true')
 
     args = parser.parse_args()
         
     full_result = {}
-    experiment = args.exp
-    qrel_path = f"/home/ace14788tj/extdisk/dense_exp/TAS-B-Reproduction/dataset/msmarco/qrels.{experiment}.small.tsv"
-    if args.run_dir:
-        for run_file in os.listdir(args.run_dir):
-            if (experiment == "fake") and ("cf" not in run_file):
-                continue
-            elif experiment not in run_file:
-                continue
-            else:
-                full_run_file_path = os.path.join(args.run_dir, run_file)
-                if os.path.isfile(full_run_file_path):
-                    res = print_res(run_file=full_run_file_path, qrel_file=qrel_path, rel_threshold=1)
-                    full_result[f"{run_file.split('/')[-1].split('.')[0]}"] = res
-    with open(os.path.join("results",f'{args.run_dir.split("/")[-3]}_{args.exp}.json'),"w")as fw:
-        json.dump(full_result, fw, indent=4)
+
+    if args.msmarco:
+        experiment = args.exp
+        qrel_path = f"/home/ace14788tj/extdisk/dense_exp/TAS-B-Reproduction/dataset/msmarco/qrels.{experiment}.small.tsv"
+        if args.run_dir:
+            for run_file in os.listdir(args.run_dir):
+                if (experiment == "fake") and ("cf" not in run_file):
+                    continue
+                elif experiment not in run_file:
+                    continue
+                else:
+                    full_run_file_path = os.path.join(args.run_dir, run_file)
+                    if os.path.isfile(full_run_file_path):
+                        res = print_res(run_file=full_run_file_path, qrel_file=qrel_path, rel_threshold=1)
+                        full_result[f"{run_file.split('/')[-1].split('.')[0]}"] = res
+        with open(os.path.join("results",f'{args.run_dir.split("/")[-3]}_{args.exp}.json'),"w")as fw:
+            json.dump(full_result, fw, indent=4)
+    
+    else:
+        experiment = args.exp
+        qrel_path = f"/home/ace14788tj/extdisk/neural_ir/bm25_searcher/collections/qrels/{experiment}/{experiment}.tsv"
+        res = print_res(run_file=args.run, qrel_file=qrel_path, rel_threshold=1)
 
 if __name__=="__main__":
     main()

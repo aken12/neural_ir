@@ -11,7 +11,16 @@ encoding_e5-base/
 encoding_e5-base-v2/
 encoding_e5-large-v2/
 monoT5_ja_1e_3/
+monoT5_ja_fp16/
 results/*
 sh_dir/
 wandb/
+gpt_rewriter/
 __pycache__
+beir_encode.sh*
+evaluate.sh*
+train.sh*
+bm25_searcher/beir_index/*
+bm25_searcher/collections/*
+bm25_searcher/results/*
+
