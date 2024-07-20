@@ -10,9 +10,12 @@ import logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-def print_res(run_file, qrel_file, rel_threshold):
-    with open(run_file, 'r' )as f:
-        run_data = f.readlines()
+def print_res(run, qrel_file, rel_threshold=1):
+    if type(run) == str:
+        with open(run, 'r' )as f:
+            run_data = f.readlines()
+    else:
+        run_data=run
     with open(qrel_file, 'r') as f:
         qrel_data = f.readlines()
     
@@ -56,6 +59,17 @@ def print_res(run_file, qrel_file, rel_threshold):
             runs_top10[query] = {}
         runs_top10[query][passage] = rel
 
+    # for qid in run_data:
+    #     sorted_passages = sorted(run_data[qid].items(), key=lambda x: x[1], reverse=True)
+
+    #     for rank, (passage, score) in enumerate(sorted_passages, start=1):
+    #         if rank > 10:
+    #             break
+    #         if qid not in runs_top10:
+    #             runs_top10[qid] = {}
+    #         runs_top10[qid][passage] = score
+    # runs = run_data
+    
     # pytrec_eval eval
     evaluator = pytrec_eval.RelevanceEvaluator(qrels, {"map", "recip_rank", "recall.10","recall.100","recall.1000"})
     res = evaluator.evaluate(runs)

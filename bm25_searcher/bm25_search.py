@@ -14,10 +14,10 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(level
 logger = logging.getLogger(__name__)
 
 def bm25(args):
-    # bm25_k1 = 0.82
-    # bm25_b = 0.68
-    bm25_k1 = 0.9
-    bm25_b = 0.4
+    bm25_k1 = 0.82
+    bm25_b = 0.68
+    # bm25_k1 = 0.9
+    # bm25_b = 0.4
     topk = 1000
 
     query_list = []
@@ -36,26 +36,38 @@ def bm25(args):
     # logger.info(f'{len(qrels)=}')
 
     with open(args.query_path)as fr:
-        for query_line in fr:
-            query_line = query_line.strip().split('\t')
-            query = query_line[1]
-
-            qid = query_line[0]
+        queries = json.load(fr)
+        for query_line in queries:
+        # for query_line in fr:
+            # query_line = json.loads(query_line)
+            # query_line = query_line.strip().split('\t')
+            # query = query_line["original"] + " " + query_line["question"]
+            if "q2d" in args.run_prefix:
+                query = f'{query_line["original"] }'*5 + " " + query_line["pseudo_doc"]
+            elif "q2e" in args.run_prefix:
+                query = query_line["original"] + " " + query_line["pseudo_doc"]
+            else:
+                query = query_line["original"]
+                
+            if "query_id" in query_line:
+                qid = str(query_line["query_id"])
+            else:
+                qid = str(query_line["id"])
+            # qid = str(query_line["id"])
 
             query_list.append(query)
             qid_list.append(qid)
 
     logger.info(f'{len(qid_list)=}')
+    logger.info(f'{query_list[:2]=}')
 
     searcher = SimpleSearcher(args.index_dir)
     searcher.set_bm25(bm25_k1, bm25_b)
     logger.info("start search...")
 
     os.makedirs(args.output_path, exist_ok=True)
-    if args.run_prefix:
-        run_file = os.path.join(args.output_path,f"{args.run_prefix}_bm25_run_k1{bm25_k1}_b{bm25_b}.txt")
-    else:
-        run_file = os.path.join(args.output_path,f"bm25_run_k1{bm25_k1}_b{bm25_b}.txt")
+
+    run_file = os.path.join(args.output_path,f"{args.task}_bm25_{args.run_prefix}.txt")
 
     batch_size = len(query_list) if args.batch_size == -1 else args.batch_size
 
@@ -167,6 +179,7 @@ def main():
     parser.add_argument('--only_eval',help='',action='store_true')
     parser.add_argument('--batch_size',help='',type=int,default=-1)
     parser.add_argument('--run_prefix',help='',default=None)
+    parser.add_argument('--task',help='',default="ambigQA")
     
     args = parser.parse_args()
 
@@ -175,9 +188,9 @@ def main():
         run_file=args.output_path
     else:
         run_file = bm25(args)
-        res = print_res(run_file=run_file, qrel_file=args.qrel_path, rel_threshold=1)
-    with open(f"{run_file}.eval","w")as fw:
-        fw.write(json.dumps(res))
+        # res = print_res(run_file=run_file, qrel_file=args.qrel_path, rel_threshold=1)
+    # with open(f"{run_file}.eval","w")as fw:
+    #     fw.write(json.dumps(res))
 
 if __name__=="__main__":
     main()

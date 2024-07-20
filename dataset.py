@@ -13,7 +13,6 @@ logging.basicConfig(
     datefmt="%m/%d/%Y %H:%M:%S",
     level=logging.INFO,
 )
-
 class EncodeDataset(Dataset):
     def __init__(self,data_args):
         self.data_args = data_args
@@ -25,6 +24,8 @@ class EncodeDataset(Dataset):
             
             if self.data_args.title:
                 self.encode_data["title"] = []
+            if self.data_args.use_pseudo_doc:
+                self.encode_data["pseudo_doc"] = []
             
             with open(self.data_args.dataset_name) as fr:
                 if self.data_args.dataset_name.split('.')[-1] == "tsv":
@@ -41,11 +42,15 @@ class EncodeDataset(Dataset):
                                 self.encode_data['title'].append(line[2])
                                 
                 else:
-                    for line in fr:
-                        line = json.loads(line)
+                    # for line in fr:
+                        # line = json.loads(line)
+                    json_data = json.load(fr)
+                    for line in json_data:
                         if self.data_args.encode_is_query:
-                            self.encode_data["query_id"].append(line[0])
-                            self.encode_data["query"].append(line[1])
+                            self.encode_data["query_id"].append(line["query_id"])
+                            self.encode_data["query"].append(line["query"])
+                            if self.data_args.use_pseudo_doc:
+                                self.encode_data["pseudo_doc"].append(line["pseudo_doc"])
                         else:
                             self.encode_data["docid"].append(line["id"])
                             self.encode_data["text"].append(line["contents"])
@@ -60,7 +65,6 @@ class EncodeDataset(Dataset):
                 self.data_args.dataset_name,
                 self.data_args.dataset_config,
                 split=self.data_args.dataset_split,
-                # cache_dir=self.data_args.dataset_cache_dir,
             )
 
         if self.data_args.dataset_number_of_shards > 1:
